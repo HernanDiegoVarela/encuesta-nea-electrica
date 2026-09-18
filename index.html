@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Encuesta de satisfacción — NEA Eléctrica</title>
+<style>
+  :root{
+    --azul:#0b3d91;
+    --azul-osc:#082a66;
+    --texto:#1a1a1a;
+    --gris:#6b7280;
+    --borde:#e5e7eb;
+    --bg:#f4f6fb;
+    --blanco:#ffffff;
+    --verde:#1f9d55;
+    --amarillo:#e6a700;
+    --rojo:#d9432a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--texto);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .card{
+    background:var(--blanco);
+    border-radius:20px;
+    box-shadow:0 8px 30px rgba(11,61,145,0.12);
+    width:100%;
+    max-width:420px;
+    padding:28px 22px 24px;
+  }
+  .logo-bar{
+    background:var(--azul);
+    border-radius:14px;
+    padding:14px;
+    text-align:center;
+    margin-bottom:20px;
+  }
+  .logo-bar span{
+    color:#fff;
+    font-weight:700;
+    font-size:1.15rem;
+    letter-spacing:0.5px;
+  }
+  h1{
+    font-size:1.15rem;
+    text-align:center;
+    margin:0 0 22px;
+    line-height:1.4;
+  }
+  .caritas{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+  }
+  .carita-btn{
+    flex:1;
+    background:var(--bg);
+    border:2px solid transparent;
+    border-radius:16px;
+    padding:16px 6px 12px;
+    text-align:center;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .carita-btn:active{ transform:scale(0.96); }
+  .carita-btn .emoji{ font-size:2.4rem; display:block; margin-bottom:6px; }
+  .carita-btn .label{ font-size:0.8rem; font-weight:600; color:var(--gris); }
+  .carita-btn.buena.selected{ border-color:var(--verde); background:#e9f9ee; }
+  .carita-btn.buena.selected .label{ color:var(--verde); }
+  .carita-btn.regular.selected{ border-color:var(--amarillo); background:#fff8e6; }
+  .carita-btn.regular.selected .label{ color:var(--amarillo); }
+  .carita-btn.mala.selected{ border-color:var(--rojo); background:#fdeceb; }
+  .carita-btn.mala.selected .label{ color:var(--rojo); }
+
+  .paso{ display:none; }
+  .paso.activo{ display:block; animation:fadein .25s ease; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .subtitulo{
+    font-size:1rem;
+    font-weight:600;
+    margin:22px 0 14px;
+    text-align:center;
+  }
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:18px;
+  }
+  .chip{
+    border:1.5px solid var(--borde);
+    border-radius:999px;
+    padding:9px 14px;
+    font-size:0.88rem;
+    cursor:pointer;
+    background:var(--blanco);
+    color:var(--texto);
+    transition:all .15s ease;
+  }
+  .chip.selected{
+    background:var(--azul);
+    border-color:var(--azul);
+    color:#fff;
+  }
+  .opciones-si-no{
+    display:flex;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .opciones-si-no button{
+    flex:1;
+    padding:13px;
+    border-radius:12px;
+    border:1.5px solid var(--borde);
+    background:var(--blanco);
+    font-size:0.95rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .opciones-si-no button.selected{
+    background:var(--azul);
+    border-color:var(--azul);
+    color:#fff;
+  }
+  label.campo-label{
+    display:block;
+    font-size:0.85rem;
+    font-weight:600;
+    margin:14px 0 6px;
+    color:var(--gris);
+  }
+  select, input[type=tel]{
+    width:100%;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1.5px solid var(--borde);
+    font-size:0.95rem;
+    background:var(--blanco);
+    color:var(--texto);
+  }
+  .btn-primario{
+    width:100%;
+    margin-top:22px;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:var(--azul);
+    color:#fff;
+    font-size:1rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primario:active{ background:var(--azul-osc); }
+  .btn-primario:disabled{ opacity:0.5; }
+  .btn-texto{
+    display:block;
+    width:100%;
+    margin-top:12px;
+    background:none;
+    border:none;
+    color:var(--gris);
+    font-size:0.85rem;
+    text-align:center;
+    cursor:pointer;
+    text-decoration:underline;
+  }
+  .gracias{
+    text-align:center;
+    padding:20px 0;
+  }
+  .gracias .emoji-final{ font-size:3rem; display:block; margin-bottom:12px; }
+  .gracias h2{ font-size:1.2rem; margin:0 0 8px; }
+  .gracias p{ color:var(--gris); font-size:0.92rem; margin:0; }
+  .error-msg{
+    color:var(--rojo);
+    font-size:0.82rem;
+    margin-top:8px;
+    display:none;
+  }
+  .spinner{
+    display:none;
+    text-align:center;
+    padding:20px 0;
+    color:var(--gris);
+    font-size:0.9rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo-bar"><span>NEA ELÉCTRICA</span></div>
+
+  <!-- PASO 1: caritas -->
+  <div class="paso activo" id="paso-1">
+    <h1>¿Cómo fue tu experiencia de compra?</h1>
+    <div class="caritas">
+      <div class="carita-btn buena" data-valor="BUENA" onclick="elegirCarita(this)">
+        <span class="emoji">😊</span>
+        <span class="label">BUENA</span>
+      </div>
+      <div class="carita-btn regular" data-valor="REGULAR" onclick="elegirCarita(this)">
+        <span class="emoji">😐</span>
+        <span class="label">REGULAR</span>
+      </div>
+      <div class="carita-btn mala" data-valor="MALA" onclick="elegirCarita(this)">
+        <span class="emoji">☹️</span>
+        <span class="label">MALA</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 2: motivos si fue MALA -->
+  <div class="paso" id="paso-2">
+    <p class="subtitulo">¿Por qué? <span style="font-weight:400;color:var(--gris);font-size:0.78rem;">(podés elegir más de una)</span></p>
+    <div class="chips" id="chips-motivos">
+      <div class="chip" data-valor="PRECIO" onclick="toggleChip(this)">PRECIO</div>
+      <div class="chip" data-valor="ASESORAMIENTO TECNICO" onclick="toggleChip(this)">ASESORAMIENTO TÉCNICO</div>
+      <div class="chip" data-valor="AMABILIDAD" onclick="toggleChip(this)">AMABILIDAD</div>
+      <div class="chip" data-valor="STOCK" onclick="toggleChip(this)">STOCK</div>
+      <div class="chip" data-valor="TIEMPO" onclick="toggleChip(this)">TIEMPO</div>
+    </div>
+    <p class="error-msg" id="error-motivos">Elegí al menos una opción para continuar.</p>
+    <button class="btn-primario" onclick="continuarDesdeMotivos()">Continuar</button>
+  </div>
+
+  <!-- PASO 3: ofertas SI/NO -->
+  <div class="paso" id="paso-3">
+    <p class="subtitulo">¿Querés recibir ofertas y novedades puntuales?</p>
+    <div class="opciones-si-no">
+      <button data-valor="SI" onclick="elegirOferta(this)">SI</button>
+      <button data-valor="NO" onclick="elegirOferta(this)">NO</button>
+    </div>
+  </div>
+
+  <!-- PASO 4: rubro + whatsapp (si dijo SI) -->
+  <div class="paso" id="paso-4">
+    <p class="subtitulo">¡Genial! Contanos un poco más</p>
+    <label class="campo-label" for="rubro">¿Qué rubro te interesa?</label>
+    <select id="rubro">
+      <option value="">Seleccioná una opción</option>
+      <option value="Electricidad domiciliaria">Electricidad domiciliaria</option>
+      <option value="Iluminación">Iluminación</option>
+      <option value="Industrial / Instalaciones grandes">Industrial / Instalaciones grandes</option>
+      <option value="Herramientas y accesorios">Herramientas y accesorios</option>
+      <option value="Cables y conductores">Cables y conductores</option>
+      <option value="Otro">Otro</option>
+    </select>
+    <label class="campo-label" for="whatsapp">Tu WhatsApp</label>
+    <input type="tel" id="whatsapp" placeholder="Ej: 3764123456" inputmode="numeric">
+    <p class="error-msg" id="error-datos">Completá el rubro y tu WhatsApp para continuar.</p>
+    <button class="btn-primario" onclick="enviarConDatos()">Enviar</button>
+  </div>
+
+  <!-- Enviando -->
+  <div class="spinner" id="spinner">Enviando tu respuesta...</div>
+
+  <!-- Final -->
+  <div class="paso" id="paso-final">
+    <div class="gracias">
+      <span class="emoji-final">🙌</span>
+      <h2>¡Gracias por tu opinión!</h2>
+      <p>Tu respuesta nos ayuda a mejorar cada día.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ====== CONFIGURÁ ACÁ LA URL DE TU GOOGLE APPS SCRIPT ======
+  const ENDPOINT_URL = "https://script.google.com/macros/s/AKfycbzXpJvuMzrN9XtqFzaDp9vB9q4m2hGYbxQuTEseUvcur2xGUfTkOfXxTdidl12LRRKJ/exec";
+  // =============================================================
+
+  const estado = {
+    calificacion: null,
+    motivos: [],
+    quiereOfertas: null,
+    rubro: null,
+    whatsapp: null
+  };
+
+  function mostrarPaso(id){
+    document.querySelectorAll('.paso').forEach(p => p.classList.remove('activo'));
+    document.getElementById(id).classList.add('activo');
+  }
+
+  function elegirCarita(el){
+    document.querySelectorAll('.carita-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    estado.calificacion = el.dataset.valor;
+    setTimeout(() => {
+      if(estado.calificacion === 'MALA'){
+        mostrarPaso('paso-2');
+      } else {
+        mostrarPaso('paso-3');
+      }
+    }, 200);
+  }
+
+  function toggleChip(el){
+    el.classList.toggle('selected');
+    document.getElementById('error-motivos').style.display = 'none';
+  }
+
+  function continuarDesdeMotivos(){
+    const seleccionados = document.querySelectorAll('#chips-motivos .chip.selected');
+    if(seleccionados.length === 0){
+      document.getElementById('error-motivos').style.display = 'block';
+      return;
+    }
+    estado.motivos = Array.from(seleccionados).map(c => c.dataset.valor);
+    mostrarPaso('paso-3');
+  }
+
+  function elegirOferta(el){
+    document.querySelectorAll('#paso-3 button').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    estado.quiereOfertas = el.dataset.valor;
+    setTimeout(() => {
+      if(estado.quiereOfertas === 'SI'){
+        mostrarPaso('paso-4');
+      } else {
+        enviarRespuesta();
+      }
+    }, 200);
+  }
+
+  function enviarConDatos(){
+    const rubro = document.getElementById('rubro').value;
+    const whatsapp = document.getElementById('whatsapp').value.trim();
+    if(!rubro || !whatsapp){
+      document.getElementById('error-datos').style.display = 'block';
+      return;
+    }
+    estado.rubro = rubro;
+    estado.whatsapp = whatsapp;
+    enviarRespuesta();
+  }
+
+  function enviarRespuesta(){
+    document.querySelectorAll('.paso').forEach(p => p.classList.remove('activo'));
+    document.getElementById('spinner').style.display = 'block';
+
+    const payload = {
+      timestamp: new Date().toISOString(),
+      calificacion: estado.calificacion,
+      motivos: estado.motivos.join(', '),
+      quiere_ofertas: estado.quiereOfertas,
+      rubro: estado.rubro || '',
+      whatsapp: estado.whatsapp || '',
+      contactar: estado.calificacion === 'MALA' ? 'SI' : 'NO'
+    };
+
+    fetch(ENDPOINT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    })
+    .catch(err => console.error('Error al enviar:', err))
+    .finally(() => {
+      document.getElementById('spinner').style.display = 'none';
+      mostrarPaso('paso-final');
+    });
+  }
+</script>
+
+</body>
+</html>
